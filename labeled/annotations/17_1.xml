@@ -1,0 +1,26 @@
+<annotation verified="yes">
+	<folder>tiles_LE</folder>
+	<filename>17_1.jpg</filename>
+	<path>/Users/home/Documents/Research/lightEchos/imgs/LEs/unique/tiles_LE/17_1.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>256</width>
+		<height>256</height>
+		<depth>1</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>LE</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>52</xmin>
+			<ymin>3</ymin>
+			<xmax>96</xmax>
+			<ymax>40</ymax>
+		</bndbox>
+	</object>
+</annotation>
