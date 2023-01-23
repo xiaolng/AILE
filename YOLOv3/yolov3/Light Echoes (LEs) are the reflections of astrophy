@@ -1,0 +1,227 @@
+Light Echoes (LEs) are the reflections of astrophysical transients off of interstellar dust. They are fascinating astronomical phenomena that enable studies of the scattering dust as well as of the original transients. LEs, however, are rare and extremely difficult to detect as they appear as faint, diffuse, time-evolving features. The detection of LEs still largely relies on human inspection of images, a method unfeasible in the era of large synoptic surveys. The Vera C. Rubin Observatory Legacy Survey of Space and Time, LSST, will generate an unprecedented amount of astronomical imaging data at high spatial resolution, exquisite image quality, and over tens of thousands of square degrees of sky: an ideal survey for LEs. However, the Rubin data processing pipelines are optimized for the detection of point-sources and will entirely miss LEs. Over the past several years, Artificial Intelligence (AI) object detection frameworks have achieved and surpassed real-time, human-level performance. In this work, we prepare a dataset from the ATLAS telescope and test a popular AI object detection framework, You Only Look Once, or YOLO, developed in the computer vision community, to demonstrate the potential of AI in the detection of LEs in astronomical images. We find that an AI framework can reach human-level performance even with a size- and quality-limited dataset. We explore and highlight challenges, including class imbalance and label incompleteness, and roadmap the work required to build an end-to-end pipeline for the automated detection and study of LEs in high-throughput astronomical surveys.
+
+AAS36436R1
+Li et al. 
+Toward automated detection of light echoes in synoptic surveys: considerations on the application of the Deep Convolutional Neural Networks
+
+We thank the reviewer for their thoughtful and careful comments. The reviewer's suggestions have pushed us to make several modifications and improvements to the model and manuscript, including modifications to the model and training data, introducing cross validation, better motivating our model selection and architectural choices, providing a direct comparison with alternative models, and more. All the reviewer's comments have been addressed, for the most part by directly embracing the reviewer's suggestion. Each point raised by the reviewer is answered below. In cases in which the reviewers' suggestions could not be implemented directly we explain why this is the case and what mitigation strategies were implemented to address the reviewer's concerns. Changes in the manuscripts are presented in red to be readily accessible to for review. After answering each point raised by the reviewer in the paragraphs that follow, we indicate at the bottom of this write up additional changes made to the model and all changes made to figures in the paper. 
+
+Our response is also available in a google doc at 
+Link to this google doc https://docs.google.com/document/d/1EwoDc5KOi0Z01aqoOKcoqL2Cq1V3YMt9UySPfzrZBaE/edit?usp=sharing 
+In this document, text written by the author is in blue. Text in black is written by the reviewer.
+
+
+Reviewer:
+The paper "Toward automated detection of light echoes in synoptic surveys: considerations on the application of the Deep Convolutional Neural Networks" presents an application of an object detection algorithm to detect light echoes from supernovae on imaging surveys.
+
+Supernova light echoes are particularly difficult to model as detection signals, as they are transient, diverse and diffuse. The paper describes an implementation of a specialized convolutional neural network for detection, widely used in the computer vision community, and tuned for light echoes on differentially subtracted images. The method and some results on a small data set from the ATLAS telescope are presented.
+
+This difficult task deserves more exposure as astronomical transient diffuse objects are not well explored in the literature. The paper is one of the very few relevant ones on this topic for the upcoming very large surveys such as with the Rubin telescope.
+
+However the paper has some issues, and it would need some moderate changes to recommend it for acceptance. I describe my main concerns below and would be happy to review a revised version of the manuscript.
+
+Note: Approaching the Light Echo (LE) detection problem with supervised deep learning, purely data-driven and trained from scratch is probably not so well posed, but I will not comment on the problem formulation as it is more speculative.
+
+
+
+Main issues of the paper:
+1) This is unclear how the proposed method generalizes beyond the small test case presented in the paper (i.e. beyond the ATLAS case), and its relevance given the very fast pace of object detection algorithms research). 
+
+ANSWER: We thank the reviewer for highlighting this excellent point as it speaks directly to the motivation of this work and its importance in the broader context of light echo discovery in upcoming surveys.  First, to the point of transferability, we note that - as the reviewer points out - the ATLAS case has relatively few light echoes with uniquely characteristic image properties.  In fact, our view is that this is actually a strength of our study.  It is certainly true that any new data set will require new training and testing sets to be created and used to train the model, however, we have demonstrated that achieving reasonable testing accuracy is possible even with very few training examples with significant image noise and confounding non-light echo artifacts and objects.  We expect then that for upcoming data sets with higher S/N and more potential light echoes and non-light echo objects on which to train, models can only be refined further.  That is, if we are able to get reasonable accuracy here, this gives us confidence that we will be able to achieve at least comparable (but likely much higher) accuracy on larger and cleaner datasets.
+
+To the point of the pace of research (both within the computer vision community as well as the astronomy community) on object detection and machine learning applications to imaging, our belief is that our manuscript fills a key gap and advances knowledge in the field of astronomy regarding which models can be used for the task of light echo detection.  In particular, we demonstrated that the methodology of using modern regional convolutional neural network architectures (i.e., architectures that identify and then classify regions of interest) as opposed to classification-only architectures produces detection accuracies that allow for the searching of extremely large upcoming data sets for these objects, a task which may very well be infeasible with sliding-window classification models.  And while it is true that these region-based models are rapidly evolving (e.g., YOLOv7 was released only a few days ago), their core conceptual foundations are common to all such models.  That is, we believe that one of the most important outcomes of this paper is the demonstration that RCNN-type models are applicable to astronomical data (low S/N, very high spatial resolution, etc) and light echo object types, and as these models are improved - perhaps only in a few months - and new models (e.g., transformer-based models, etc.) come on line, members of the astronomical community whose work focuses on light echo detection can follow those developments in the Computer Vision community with the knowledge that these models may be applied to their data as well.
+
+We have added text to the Conclusion section articulating these points related to transferability and applicability of our work in the broader context of the future of light echo detections.
+
+
+As for the utility of the ATLAS dataset in particular, this dataset, together with DECam data, is a key dataset for current LE searches. Our team has been visually inspecting both dataset for light echoes and following them up for individual studies. In the current paper, we investigated and assessed the impact of many peculiarity of light echoes on their automated detection, such as the ambiguity in drawing annotation boxes, the incompleteness and imbalance of the data, all of which are relevant to any light echo survey and our conclusions should fully generalize to them. It is our plan to retrain the same models on future datasets, including commissioning Rubin data.
+
+
+2) I may be misunderstanding, but the non-LE class seems to be only restricted to stars. A too restrictive non-LE class could result in over-confident performance metrics. 
+
+ANSWER: This is an excellent point that highlights important subtleties in the supervised learning process as implemented in regional CNN architectures.  As the reviewer points out, having a single class for non-LE objects has the potential to subtly bias detection rates of LEs.  By definition, RCNN-type object detection assumes 100% comprehensive labeling of training/testing images, since non-labeled regions are assumed to not contain objects by default.  Comprehensive labeling is tricky to achieve in general, but is particularly challenging in astronomical images where objects appear at all SNR levels, and even more for LEs which are diffuse objects without perfectly clear boundaries.  And so those regions that are not labeled as being LEs can lead to missed LEs (and a reduction in performance metrics) if the model is trained to classify some regions that actually are LEs as being not LEs.  Of course, as the reviewer points out, the opposite is also true.  Regions that contain spatial features that are similar to LEs can lead to misclassification of non-LEs as LEs and so even though we are only interested in detecting LEs, we can "help" the model by also telling it which objects are explicitly not LEs.  The majority of such signals in our ATLAS difference images are stars, however, the reviewer's point that other such features could also be construed as light echoes is well taken.  To address this, we have included a third, catch-all "others" class that includes streaking, satellites, etc.  While in theory RCNN-type models would only require the comprehensive labeling of LEs and sufficient numbers of training images for the model to effectively discriminate between LEs and non-LEs based purely on the fact that all non-LEs were not labeled as LEs, our small sample size and relatively low SNR objects necessitate the labeling of non-LE classes and we describe our implementation of the reviewer's suggestion in Section 3. 
+ 
+
+I also found other few more specific issues, some easy to fix, but a few of them maybe more concerning. I detail all my comments below.
+
+
+Abstract:
+
+L22: YOLO. Unroll the acronym.
+
+ANSWER: Thank you, this has been corrected.
+
+
+L24: label incompleteness, etc : more precision. what hides in the "etc"?
+
+ANSWER: The reviewer's point is well taken, however, due to the editorial limits on the size of the abstract, we defer specifics to the body of the text and remove the "etc".  That said, we note that class imbalance and label incompleteness are the two main issues of the dataset.
+
+
+1. Introduction L61-64: "To date, no algorithm": There is at least one other paper A&A655, A82 Bullhar et al (2021) proposing a different perspective on LEdetection with AI. The "related work" section deserves more research. 
+
+ANSWER:  We've added references to Bullhar et al. and modified the sentence to be more specific. It now reads "detecting and localizing LEs in untargeted image surveys". 
+
+
+A comparison with the Bullhar2021 would be very welcome, even if only qualitative, given that the capsule networks method does seem to encode more inductive biases as the DarkNet-53 CNN, and therefore be a better performer in the regime of a very low label training set.
+
+ANSWER: We added a paragraph directly comparing the two models in Section 5
+
+
+3. Data L206-207: DIA was "first developed¨. While Tomaney & Crotts (1996) is one paper that describes a DIA implementation, this was certainly not\ the first. DIA was developed much before, e.g. Phillips & Davis (1995), Perlmutter et al. (1995) or even Norgaard-Nielsen et al. (1989). 
+
+ANSWER: We thank the referee for pointing out this omission - in fact we had the incorrect citation on the paper draft and wanted to cite Crotts 1992 rather than Tomaney and Crotts 1996. We corrected this citation and added the additional citations as suggested by the reviewer.
+
+
+L213: "good noise properties": too vague, and how does noise influence LE detection? 
+
+ANSWER:  We thank the referee for noting and pointing out the ambiguity in our discussion. Here we only refer to the difference image analysis (DIA) process and the selection of templates, for which there is not overall survey-independent quality cut, but templates nearly always are chosen to be of the highest quality the survey can produce, so some of the ambiguity and vagueness in our sentence reflect the ambiguity intrinsic in the process. Nonetheless, we appreciate and embrace the reviewer's suggestion and we reworded sentences (see below). Note that while noise does influence the detection of the LEs, here we are not talking about the SNR of the science image (the image in which we seek to find a light echo), but about the template's, which, to iterate, is assumed to be characteristically of better quality than the science imace itself and it is ultimately degraded to match the science image quality. The sentence now reads: 
+
+Two images, of which one is considered a "template", are aligned, PSF-matched, and subtracted from one-another.   The template itself can be a single-, or more commonly a composite-image (generally from the same survey) with image properties that reach or approach the highest image quality the survey is capable of acquiring (in terms of overall noise, spatial resolution, and depth).
+
+
+
+L223 and Table 1: The table does not list what the text says: filters, cadence are at least missing. 
+
+ANSWER:  We thank the referee for noticing this inconsistency and bringing it to our attention. Table 1 was updated and its reference in the text have been updated. A link to further information about the ATLAS survey has been added to the caption of Table 1.
+
+
+L227: images are 1800x1800: Table 1 says the format is 10560 × 10560. Where did the extra pixels go?  
+
+ANSWER:  10560 × 10560 pixels is the original image size off the telescope, which is processed to 1800x1800 through the DIA pipeline; this was clarified in table 2 and Section 3 paragraph 4
+
+
+L233: "high signal-to-noise ratio": needs quantification. What is "high"? How do detection metrics vary in function of SNR?
+
+ANSWER:  We thank the reviewer for pointing out the ambiguity of our definition. In this context, we simply mean LEs that are detectable by visual inspection, so our definition of "high SNR" is indeed quite loose. We did however design a functional definition of SNR for LEs, which tracks our visual inspection estimate of LE "brightness", which is not described in a footnote. 
+We estimate the SNR of a LE through its interquartile range, which tells us the spread of a distribution of FITS values and the intensity of the "dipole-like" feature in the LE (the interquartile range IQR is defined as the difference between FITS values at 75% to 25%). We then weight this number by the size of the region interested by the LE as SNR = IQR / log10(Npixels).
+The paragraph has been updated accordingly.
+
+We also note that the SNR thus defines generally tracks the classification score generated by our model. At this time, we think that including this discussion in the paper may be out of scope, but we are happy to head the reviewer's opinion about this.
+
+The figure we produced is available in the google doc https://docs.google.com/document/d/1EwoDc5KOi0Z01aqoOKcoqL2Cq1V3YMt9UySPfzrZBaE/edit?usp=sharing.
+
+L241: "as an ensembles": singular.
+
+ANSWER:  We've corrected the grammar. Thank you for spotting this.
+
+
+L249-251: "dramatically limited in size compared to traditional AI-based image analysis datasets": this assertion should be more restrictive to supervised deep learning as it gives a false impression AI is limited to SL with lots of labels.
+
+ANSWER:  This is a very good point (especially in light of some of the current ML research efforts focused on building models with very few labeled examples) and we have modified the language per the reviewer's suggestion.
+
+
+
+
+L253-258: "we draw bounding boxes for two classes" - "we refrain from labelling at this time": this needs more explanation. This is not clear how a DIA defect/dipole from badly subtracted stars would be the only bad detections. Why not LE vs.others instead of vs. star detections? The paper reads as this choice was too arbitrary.
+
+
+ANSWER:  We thank the referee for the suggestion. As discussed in the answer to the second of the referee's major points, we added a third label, ``other', which contains other non-noise features present in the images, such as star streaks, satellites, artifacts etc. We found that this makes the model more reliable and helps reduce about 10% of false positives when applied to larger datasets as shown in Figure 10b. 
+
+L267: "a bias in learning": too vague. What kind of bias? I am guessing the authors wanted to emphasize the selection and distributional imbalance, but could explain or show how it results in detection metrics.
+
+ANSWER:  We thank the referee for pointing this out and agree that our language was too vague.  We have updated that language to explain that class imbalance in the training of ML models can have the effect that the trained models may have better performance metrics on over-represented classes relative to under-represented classes since over-represented classes have more influence on the loss function.  However, we also note that in-class diversity and object S/N are other important factors which may either mitigate or enhance this effect. This possible bias and our approach to mitigate it are now described in detail in the sixth paragraph of secion 3:
+Because LEs are rare phenomena, much rarer than stars, 
+{there exists a large class imbalance between the number of objects in our three classes, and we note that imbalance in the training dataset can potentially introduce a bias in learning \citep{oksuz2020imbalance} and should therefore be addressed}.  \red{The root of this potential bias lies in the fact that over-represented classes have more influence on the loss function, when the loss function is calculated as an average or median across all examples. Class imbalance in the training of ML models might thus lead to better performance on over-represented classes relative to under-represented ones.  However, we also note that in-class diversity and the SNR of individual objects are other important factors which may either reduce or enhance this effect. While we will implement a modification of the YOLO loss function that will help mitigate the risk of this bias (see \autoref{sec:method}),  we also address the class imbalance in data preparation.}
+
+
+L274-275: rotate and flip images as data augmentation. Cropping, maybe blurring, or even MixUp are known to be very performing data augmentation techniques in diverse contexts, both in computer vision and astronomy. Another data augmentation suggestion: cut and paste LE cutouts on DIA images without LE. Anyway, this is not clear to me why restricting the data augmentation to only simple 90-degree rotation/flips with such a small label dataset. This would require more justification, even for a prototype-case study, as it very likely influences the precision/recall and robustness.
+
+ANSWER: All of these data augmentation suggestions are valid. However, for this work, we purposefully restrict augmentation to simple procedures that do not require us to have accurate knowledge of the noise model for the ATLAS survey in order to avoid the risk of inadvertedly  biasing our result. To be specific, our explicit concerns about augmentation techniques other than simple rotation are:
+
+Cropping: this method would modify the size of the PSF and the DIA residuals in correspondence of stars which are present in the ATLAS image including in correspondence to non-saturated stars. In the context of a model developed for a single survey we believe it is not advisable to generate images that would produce a characteristically too large or too small PSF. Cropping would also require pixel interpolation to scale the resulting cropped image to the correct input size, and interpolation without knowledge of the noise model would generate potential bias in the modified images. 
+
+Blurring: this also would correspond to artificially modifying the PSF of the image. This is probably the least risky augmentation but the blurr range would be limited to a factor ~2. Given the natural range of PSF size in the survey data we used for training, we do not expect this augmentation to lead to substantial changes in model performance.
+
+Cut and paste LE cutouts on DIA - at this stage we would be unable to avoid the generation of edge effects without in depth studies of the ATALS noise model. The background noise of the DIA images is diverse, being impacted by both the science and template image quality, the density of stars in the fields (as the ATLAS DIA pipeline generates residuals in stars even below the saturation limit), etc. 
+
+Mix-up: mix up is generally performed to associate objects that may overlap in images but do not overlap in the present training dataset. In our case LEs overlap stars (saturated or not) and streaks naturally. Mix-up would also cause the generation of artifacts in the image at the edges of the image segment added to the original image since, without an accurate model for the image noise, we would not be able to blend the a cut out in the image.
+
+Finally, the reason to limit the rotation to 90-degree increments is to avoid interpolation (which, again, would yield fundamentally different noise characteristics for the interpolated image). We note that the orientation of the LE by its nature presents higher randomness than every-day images for which augmentation techniques are generally developed: since there is no preferential axis of orientation for the LE with respect to the image up-down direction, after doing three times of 90-degree rotation,  the distribution spans all degrees.  
+
+To enable appropriate augmentation of these data, we are currently performing an in-depth study if the effects of of augmentation on of our data in the detection fo LE through contrastive learning. In this work we are in fact considering blurring, cut and paste, and increasing the noise of the images with a range of assumption on the image background noise spectrum (beyond the simple assumption of Gaussian noise). But this work is beyond the scope of the present study and we expect it to be written up in a follow-up publication where we also explore the use of multi-epoch image series.
+
+L302-303: "subtracting the mean and dividing the result by the standard deviation": the mean and stddev of the pixel intensity distribution.
+
+ANSWER: This was clarified in paper. The normalization is done by subtracting the mean and standard deviation of the distribution of pixel values in the clipped FITS images.
+
+Table 4: what does the "Adding Noise" row mean? This is not described in the text either.
+
+ANSWER:  We've removed this row in the table, since, as discussed above, we have not explored the effect of augmenting our images by modifying the image noise in this paper (see earlier discussion of augmentation)
+
+NOTE: There is a 3.1 subsection, but no other subsection.
+
+ANSWER:  We thank the referee for catching this. We have removed the subsection header.
+
+4. Methodology YOLOv3: There are a large number of object detection implementations in the Computer Vision literature, including e.g. YOLOv5, MMDetection, Detectron2 known to implement very performant object detection algorithms. It would be very beneficial for astronomy readers if more explanation in what drove the YOLOv3 selection for LE detection was given. This is not clear how the introduction of this Methodology section justifies the algorithm choice.
+
+ANSWER: We thank the reviewer for highlighting this important point.  We have updated the text in the Methodology section to address our model choice.  In particular, we note that our choice of YOLOv3 is motivated by a desire to use a model that is both "foundational" in terms of region-based CNN object detection methodology and with comparable performance to models under active development.  That is, one of the goals of this paper is to demonstrate that region-based CNN models can be used for the purpose of detecting LEs in upcoming surveys, and so future work can be aimed at assessing the relative advantages of one particular implementation over another. 
+
+That said, although we did not report this in the paper to keep the focus more narrow, while YOLOv5 is still under active development through the github repo, at the suggestion of the reviewer we have initiated experiments with YOLO5 and found no improvement in performance by switching to this more recent version. Conversely, we found the ongoing updates by the development team to the YOLOv5 model that were happening while we were developing our implementation to be disruptive in that they necessitated continuous modifications to our workflow.  We note that the improvements between YOLOv3 and YOLOv4/YOLOv5 pertain largely to data augmentations (including the addition of cutout, cutmix, and mosaic), but as discussed above, our strategy for data-augmentation is specific to astrophysical data and to our dataset in particular.  Furthermore, v6 and v7 have now also been released with similar active development issues.  Ultimately, we feel that choosing a foundational region-based CNN model that produces consistent results is a more productive strategy to demonstrate the potential of this family of models in the solution of our specific problem, as opposed to chasing the latest cutting edge versions.
+
+
+L415: "downsampling through Darknet-53": needs more clarification for a reader non-familiar with "Darknet-53".
+
+ANSWER:  We thank the reviewer for pointing this out and agree that our original text was insufficiently clear and detailed.  We have cleaned and updated this description of the application of Darknet-53 to our images (including text regarding the strides used in some of Darknet-53's convolutional layers) and the resultant bounding boxes.
+
+
+4.2 Algorithm Box Should the result of the algorithm be a threshold value rather than a "plot"?
+
+ANSWER:  This is an excellent point and we have significantly updated the Algorithm Box to clarify our procedure for determining precision, recall, and F1 as a function of the classification and IoP thresholds.
+
+
+4.3 Training- What are the training set, validation and the test set proportion/sizes? What kind of cross-validation scheme? It is important to specify them in this highly imbalanced case, and cross-validation strategies can help dealing with imbalance.
+
+ANSWER: We originally had not performed a cross-validation,  but in the revised version we present here, embracing the excellent suggestion made by the reviewer, we performed a 2x three-fold cross-validation, obtaining a total of 6 cross validation sets.  28 images with LEs were randomly split into 10, 10 and 8 subsets with one subset kept for validation. We replaced figure 8, the plots of loss function, by the average over all six times of training. We also updated figure 9, where we show the PR curves (but opted to show a single cross-validation set in this figure, in order to not to complicate the figure too much). The performance of the model varies based on the noise level of image and of morphological features of LEs across the cross-validation sets.  This is now discussed in detail in section 4.3  
+
+
+
+5. Results- The quoted scores are supposedly probabilities (L506)? Given their very low threshold on these to obtain good precision/recall, I am not sure there were any effort to the calibrate probabilities.
+
+
+ANSWER:  This is an excellent point. We now point out in section 5 that the scores that lead to satisfactory performance are very small and that they should not be interpreted as probabilities nor can they be compared across classes without calibration. The current sentence reads:
+We note that both probability classification threshold and box-overlap threshold have to be set to very low values to achieve the desired performance (0.2 and 0.1 respectively for our best preforming model). This implies that the classification score shall not be interpreted as a ``probability' without performing a re-calibration; the classification score for stars and for LEs cannot be compared and thresholds should be set separately for each class. }
+
+
+- Given the paper claims some robustness to imbalance thanks to the focal loss, it would have been more convincing to exemplify the robustness with a supplementary plot, for example with showing the influence of the LE/non-LE ratio.
+
+ANSWER:  This is a good point and we appreciate the reviewer's suggestion. In the process of developing our model we have tested several combinations of labels and were able to notice that with our modified loss function we increased our robustness to imbalance. However, the model underwent several updates since then so the "historical" data on this cannot be used. One way to produce a plot that demonstrates this would be to retrain the model with different datasets that include progressively larger imbalance, but this requires training the model over and over again and we cannot afford the added computational cost at this time. A simpler visualization that provides evidence that we are robust to imbalance, and that is not computationally expensive, is a scatter plot showing our precision (or equivalently recall) as a function of the ration of the number of stars (the largest class) and LE annotations in the image. 
+
+
+As can be seen in this plot, the precision is largely independent of the fraction of stars. 
+
+The figure we produced is available in the google doc https://docs.google.com/document/d/1EwoDc5KOi0Z01aqoOKcoqL2Cq1V3YMt9UySPfzrZBaE/edit?usp=sharing.
+
+L632: The linked GitHub repository does not seem to correspond much to the current paper version.
+
+ANSWER:  We have updated the github repository.
+
+
+
+6. Conclusion L661: "sufficiently robust to larger datasets": this is not clear to me how to reach this conclusion from the analysis.
+
+
+ANSWER:  We agree with the referee that our statement was too vague. We have rephrased this paragraph and updated figure 10, which shows the  performance on a larger dataset in which contains images without any LEs, an important consideration thinking about the application of a model to large datasets. 
+
+
+L665: "noise properties of the Rubin LSST images are expected to be far superior": superior is neither a useful nor descriptive term in this context
+
+
+ANSWER: A more detailed description of the expectation for the LSST survey image quality, and references to augment that description, have been added to this paragraph (third paragraph in the conclusions) 
+
+
+ADDITIONAL CHANGES: 
+Two further changes should be notes: we revised our initial LE selection and removed what we believe are two "inactive" LEs from the sample. Those features do not display the typical dipole morphology of LEs and instead they are (faintly) dark clusters of pixels generated by LEs that have now faded. Since detection of LEs is generally aimed to the collection of additional data, (e.g. spectroscopy) that can lead to a better understanding of the nature of the LEs, these inactive LEs are an unnecessary challenge to our model, missing as they do a characteristic LE feature and not expecting to lead to useful LE data. Thus our sample dropped from 19 to 17. 
+
+We revisited the metric applied  in the model evaluation phase and we found that the IoP, when applied correctly with evaluation annotations that surround the whole LE group, can reduce the number count of false positives, leading to a slightly better result than the modified IoU. 
+
+
+CHANGES to figures and tables:
+
+Figure 2: added the bounding box of the third label (“other”).
+Figure 3: updated plot of sky positions after we adjust the number of LE to 17.
+Figure 4: modified postage stamps to include the “other” label.
+Figure 5: updated the histogram to include the “other” label.
+Figure 7: changed the two-panel figure to a three-panel figure that displays the score vs IoU and IoP scatter plots separately
+Figure 8: updated the loss and, all curves represent average across 6 cross-validation datasets;
+Figure 9: updated the plot of ROC and PR curve using IoP as the evaluation metric
+Figure 10: updated image with new results.
