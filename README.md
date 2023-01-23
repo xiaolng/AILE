@@ -11,7 +11,10 @@ Dependencies
 
 
 ## Background
-![alt text](figures/LE_split "Light Echoes from ATLAS")
+
+Light echoes (LEs) are the re!ections of astrophysical transients off of interstellar dust. They are fascinating astronomical phenomena that enable studies of the scattering dust as well as of the original transients. LEs, however, are rare and extremely dif"cult to detect as they appear as faint, diffuse, time-evolving features. The detection of LEs still largely relies on human inspection of images, a method unfeasible in the era of large synoptic surveys.
+
+![alt text](figures/LE_split.png "Light Echoes from ATLAS")
 
 
 
