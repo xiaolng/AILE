@@ -6,13 +6,16 @@ This module uses YOLOv3, a popular real-time object detection system, to detect 
 Dependencies
 
 - python 3.6
-- tensorflow 2.x
 - numpy 
 - matplotlib
+- tensorflow 2.x
+- astropy
+- opencv
+- labelme
 
 ## Background
 
-Light echoes (LEs) are the re!ections of astrophysical transients off of interstellar dust. They are fascinating astronomical phenomena that enable studies of the scattering dust as well as of the original transients. LEs, however, are rare and extremely dif"cult to detect as they appear as faint, diffuse, time-evolving features. The detection of LEs still largely relies on human inspection of images, a method unfeasible in the era of large synoptic surveys. We prepared a dataset from ATLAS telescope and assessing the ability of YOLO for detection of LEs.
+Light echoes (LEs) are the re!ections of astrophysical transients off of interstellar dust. They are fascinating astronomical phenomena that enable studies of the scattering dust as well as of the original transients. LEs, however, are rare and extremely dif"cult to detect as they appear as faint, diffuse, time-evolving features. The detection of LEs still largely relies on human inspection of images, a method unfeasible in the era of large synoptic surveys. We prepared a dataset from ATLAS telescope and assessing the ability of YOLOv3 for detection of LEs.
 
 ![LE_split.png](figures/LE_split.png "Light Echoes from ATLAS")
 
@@ -35,7 +38,7 @@ We train the model on Google Colab platform. We evaulate the model by precision,
 ## Limitations
 
 The model has been trained on a limited dataset from ATLAS telescope.
-The input image is currently cropped to $576\time 576$. 
+The input image is currently cropped to $576\times 576$. 
 
 
 ## Future Work
@@ -47,9 +50,9 @@ Extend the module to handle multi-channel data.
 Extend the module to handle time-series image data.
 
 ## References
-[YOLOv3](https://doi.org/10.48550/arXiv.1804.02767)
+- [YOLOv3](https://doi.org/10.48550/arXiv.1804.02767)
 
-[Toward the Automated Detection of Light Echoes in Synoptic Surveys: Considerations on the Application of Deep Convolutional Neural Networks](https://doi.org/10.3847/1538-3881/ac9409)
+- [Toward the Automated Detection of Light Echoes in Synoptic Surveys: Considerations on the Application of Deep Convolutional Neural Networks](https://doi.org/10.3847/1538-3881/ac9409)
 
 
 Contributions
