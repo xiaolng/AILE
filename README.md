@@ -1,7 +1,26 @@
-# Light Echo Detection Module
+
+
+# AILE: AI powered Light Echo detection module
 
 This module uses YOLOv3, a popular real-time object detection system, to detect light echoes in survey images from modern telescopes. The module is implemented in python and can be easily integrated into detection pipelines. See this [article](https://doi.org/10.3847/1538-3881/ac9409) for more details.
 
+Please cite our work if you use the content of this repository:
+
+Li, X., Bianco, F.B., Dobler, G., Partoush, R., Rest, A., Acero-Cuellar, T., Clarke, R., Fortino, W.F., Khakpash, S. and Lian, M., 2022. Toward the Automated Detection of Light Echoes in Synoptic Surveys: Considerations on the Application of Deep Convolutional Neural Networks. The Astronomical Journal, 164(6), p.250.
+
+@article{Li_2022,
+doi = {10.3847/1538-3881/ac9409},
+url = {https://dx.doi.org/10.3847/1538-3881/ac9409},
+year = {2022},
+month = {nov},
+publisher = {The American Astronomical Society},
+volume = {164},
+number = {6},
+pages = {250},
+author = {Xiaolong Li and Federica B. Bianco and Gregory Dobler and Roee Partoush and Armin Rest and Tatiana Acero-Cuellar and Riley Clarke and Willow Fox Fortino and Somayeh Khakpash and Ming Lian},
+title = {Toward the Automated Detection of Light Echoes in Synoptic Surveys: Considerations on the Application of Deep Convolutional Neural Networks},
+journal = {The Astronomical Journal},
+}
 
 Dependencies
 
